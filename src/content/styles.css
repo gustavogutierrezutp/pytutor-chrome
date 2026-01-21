@@ -69,6 +69,15 @@ body.pytutor-focus-mode #pyOutputPane {
   transform: translateY(0);
 }
 
+.pytutor-focus-btn.capture {
+  background: rgba(79, 70, 229, 0.85);
+  /* Indigo/Purple for capture */
+}
+
+.pytutor-focus-btn.capture:hover {
+  background: rgba(67, 56, 202, 0.95);
+}
+
 .pytutor-focus-btn.exit {
   background: rgba(239, 68, 68, 0.85);
   /* Red for exit */

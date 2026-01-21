@@ -1,5 +1,5 @@
-// Content script for pythontutor.com focus mode
 import './styles.css';
+import html2canvas from 'html2canvas';
 
 const FOCUS_MODE_CLASS = 'pytutor-focus-mode';
 const STORAGE_KEY = 'focusModeEnabled';
@@ -73,6 +73,13 @@ function createFocusUI() {
   container.id = 'pytutor-focus-ui';
   container.className = 'pytutor-focus-ui';
 
+  // Button to capture screenshot of #pyCodeOutput
+  const captureBtn = document.createElement('button');
+  captureBtn.className = 'pytutor-focus-btn capture';
+  captureBtn.innerHTML = '<span>📸 Capture Trace</span>';
+  captureBtn.title = 'Screenshot of the code panel';
+  captureBtn.addEventListener('click', captureTrace);
+
   // Button to toggle #langDisplayDiv
   const toggleDetailsBtn = document.createElement('button');
   toggleDetailsBtn.className = 'pytutor-focus-btn';
@@ -95,9 +102,84 @@ function createFocusUI() {
     toggleFocusMode();
   });
 
+  container.appendChild(captureBtn);
   container.appendChild(toggleDetailsBtn);
   container.appendChild(exitBtn);
   document.body.appendChild(container);
+}
+
+async function captureTrace() {
+  const codeDisplay = document.getElementById('codeDisplayDiv');
+  const dataViz = document.getElementById('dataViz');
+
+  if (!codeDisplay || !dataViz) {
+    alert('Could not find visualization elements to capture.');
+    return;
+  }
+
+  // Find the closest common parent that contains both
+  const target = codeDisplay.closest('tr') || codeDisplay.closest('table') || codeDisplay;
+
+  const btn = document.querySelector('.pytutor-focus-btn.capture') as HTMLButtonElement;
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳ Capturing...</span>';
+
+  // Noise elements to hide for a minimal clean screenshot
+  const noiseSelectors = [
+    '#navControlsDiv', '#executionSlider', '#editCodeLinkDiv',
+    '#langDisplayDiv', '#jmpStepFwd', '#jmpPrevInstr',
+    '#jmpFirstInstr', '#jmpLastInstr', '#curInstr', '#editBtn',
+    '.ui-button', '#aiQuestionSelector', '#progOutputs',
+    '#teacher-mode-signup', '#uiControlsPane', '#cppDetailPane'
+  ];
+  const noiseElements: { el: HTMLElement, originalDisplay: string }[] = [];
+
+  noiseSelectors.forEach(selector => {
+    const el = document.querySelector(selector) as HTMLElement;
+    if (el && target.contains(el)) {
+      noiseElements.push({ el, originalDisplay: el.style.display });
+      // Use !important to override the focus mode CSS and effectively remove the node from layout
+      el.style.setProperty('display', 'none', 'important');
+    }
+  });
+
+  try {
+    const canvas = await html2canvas(target as HTMLElement, {
+      backgroundColor: '#ffffff',
+      scale: 2, // High DPI
+      logging: false,
+      useCORS: true
+    });
+
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    link.download = `pytutor-combined-trace-${timestamp}.png`;
+    link.href = dataUrl;
+    link.click();
+
+    btn.innerHTML = '<span>✅ Captured!</span>';
+  } catch (error) {
+    console.error('[PyTutor Focus] Capture failed:', error);
+    btn.innerHTML = '<span>❌ Failed</span>';
+  } finally {
+    // Restore display of noise elements
+    noiseElements.forEach(({ el, originalDisplay }) => {
+      if (originalDisplay) {
+        el.style.setProperty('display', originalDisplay);
+      } else {
+        el.style.removeProperty('display');
+      }
+    });
+
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+    }, 2000);
+  }
 }
 
 function removeFocusUI() {
