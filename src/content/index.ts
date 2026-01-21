@@ -127,21 +127,26 @@ async function captureTrace() {
 
   // Noise elements to hide for a minimal clean screenshot
   const noiseSelectors = [
-    '#navControlsDiv', '#executionSlider', '#editCodeLinkDiv',
+    '#navControlsDiv', '#executionSlider', '.executionSlider', '#editCodeLinkDiv',
     '#langDisplayDiv', '#jmpStepFwd', '#jmpPrevInstr',
     '#jmpFirstInstr', '#jmpLastInstr', '#curInstr', '#editBtn',
     '.ui-button', '#aiQuestionSelector', '#progOutputs',
-    '#teacher-mode-signup', '#uiControlsPane', '#cppDetailPane'
+    '#teacher-mode-signup', '#uiControlsPane', '#cppDetailPane',
+    '#legendDiv', '#aiTutorGreetings'
   ];
   const noiseElements: { el: HTMLElement, originalDisplay: string }[] = [];
 
   noiseSelectors.forEach(selector => {
-    const el = document.querySelector(selector) as HTMLElement;
-    if (el && target.contains(el)) {
-      noiseElements.push({ el, originalDisplay: el.style.display });
-      // Use !important to override the focus mode CSS and effectively remove the node from layout
-      el.style.setProperty('display', 'none', 'important');
-    }
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+      const htmlEl = el as HTMLElement;
+      if (htmlEl) {
+        // Record and hide everything matching, regardless of target nesting
+        // to ensure layout collapse across the board during the capture frame.
+        noiseElements.push({ el: htmlEl, originalDisplay: htmlEl.style.display });
+        htmlEl.style.setProperty('display', 'none', 'important');
+      }
+    });
   });
 
   try {
