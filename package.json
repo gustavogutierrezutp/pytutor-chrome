@@ -1,0 +1,26 @@
+{
+  "name": "pytutor-chrome",
+  "version": "1.0.0",
+  "description": "Chrome extension to enhance pythontutor.com with focus mode",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc && vite build && npm run postbuild",
+    "postbuild": "mv dist/src/popup/index.html dist/popup/ 2>/dev/null || true && rm -rf dist/src",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "chrome-extension",
+    "pythontutor",
+    "focus-mode"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^25.0.9",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vite-plugin-static-copy": "^1.0.0"
+  }
+}
