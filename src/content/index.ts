@@ -79,10 +79,12 @@ function createFocusUI() {
   toggleDetailsBtn.innerHTML = '<span>👁️ Toggle Details</span>';
   toggleDetailsBtn.addEventListener('click', () => {
     const langDiv = document.getElementById('langDisplayDiv');
-    if (langDiv) {
-      const isHidden = langDiv.classList.toggle('pytutor-hidden-extra');
-      toggleDetailsBtn.innerHTML = isHidden ? '<span>🙈 Show Details</span>' : '<span>👁️ Hide Details</span>';
-    }
+    const editLinkDiv = document.getElementById('editCodeLinkDiv');
+
+    const isHidden = langDiv?.classList.toggle('pytutor-hidden-extra');
+    editLinkDiv?.classList.toggle('pytutor-hidden-extra');
+
+    toggleDetailsBtn.innerHTML = isHidden ? '<span>🙈 Show Details</span>' : '<span>👁️ Hide Details</span>';
   });
 
   // Button to exit focus mode
