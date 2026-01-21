@@ -56,12 +56,53 @@ function toggleFocusMode() {
 
 function enableFocusMode() {
   document.body.classList.add(FOCUS_MODE_CLASS);
+  createFocusUI();
   console.log('[PyTutor Focus] Focus mode enabled - showing only #pyOutputPane');
 }
 
 function disableFocusMode() {
   document.body.classList.remove(FOCUS_MODE_CLASS);
+  removeFocusUI();
   console.log('[PyTutor Focus] Focus mode disabled - showing all elements');
+}
+
+function createFocusUI() {
+  removeFocusUI(); // Clean up existing if any
+
+  const container = document.createElement('div');
+  container.id = 'pytutor-focus-ui';
+  container.className = 'pytutor-focus-ui';
+
+  // Button to toggle #langDisplayDiv
+  const toggleDetailsBtn = document.createElement('button');
+  toggleDetailsBtn.className = 'pytutor-focus-btn';
+  toggleDetailsBtn.innerHTML = '<span>👁️ Toggle Details</span>';
+  toggleDetailsBtn.addEventListener('click', () => {
+    const langDiv = document.getElementById('langDisplayDiv');
+    if (langDiv) {
+      const isHidden = langDiv.classList.toggle('pytutor-hidden-extra');
+      toggleDetailsBtn.innerHTML = isHidden ? '<span>🙈 Show Details</span>' : '<span>👁️ Hide Details</span>';
+    }
+  });
+
+  // Button to exit focus mode
+  const exitBtn = document.createElement('button');
+  exitBtn.className = 'pytutor-focus-btn exit';
+  exitBtn.innerHTML = '<span>🚪 Exit Focus</span>';
+  exitBtn.addEventListener('click', () => {
+    toggleFocusMode();
+  });
+
+  container.appendChild(toggleDetailsBtn);
+  container.appendChild(exitBtn);
+  document.body.appendChild(container);
+}
+
+function removeFocusUI() {
+  const existing = document.getElementById('pytutor-focus-ui');
+  if (existing) {
+    existing.remove();
+  }
 }
 
 // Export for potential use

@@ -28,31 +28,65 @@ body.pytutor-focus-mode #pyOutputPane {
   opacity: 1 !important;
 }
 
-/* Optional: Add a subtle indicator that focus mode is active */
-body.pytutor-focus-mode::before {
-  content: "Focus Mode Active (Ctrl+Shift+F to toggle)";
+/* UI Container for buttons */
+.pytutor-focus-ui {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: system-ui, -apple-system, sans-serif;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
   z-index: 999999;
-  pointer-events: none;
-  animation: fadeIn 0.3s ease-in;
+  pointer-events: auto;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+/* Base button styling */
+.pytutor-focus-btn {
+  background: rgba(31, 41, 55, 0.85);
+  /* Darker gray with transparency */
+  backdrop-filter: blur(8px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.pytutor-focus-btn:hover {
+  background: rgba(55, 65, 81, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.pytutor-focus-btn:active {
+  transform: translateY(0);
+}
+
+.pytutor-focus-btn.exit {
+  background: rgba(239, 68, 68, 0.85);
+  /* Red for exit */
+}
+
+.pytutor-focus-btn.exit:hover {
+  background: rgba(220, 38, 38, 0.95);
+}
+
+/* Ensure container and children are visible */
+body.pytutor-focus-mode .pytutor-focus-ui,
+body.pytutor-focus-mode .pytutor-focus-ui * {
+  visibility: visible !important;
+}
+
+/* Utility to hide extra info */
+.pytutor-hidden-extra {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
