@@ -161,7 +161,19 @@ async function captureTrace() {
     link.href = dataUrl;
     link.click();
 
-    btn.innerHTML = '<span>✅ Captured!</span>';
+    // --- NEW: Copy to Clipboard ---
+    canvas.toBlob(async (blob) => {
+      if (blob) {
+        try {
+          const item = new ClipboardItem({ 'image/png': blob });
+          await navigator.clipboard.write([item]);
+          btn.innerHTML = '<span>✅ Captured & Copied!</span>';
+        } catch (clipboardError) {
+          console.error('[PyTutor Focus] Clipboard copy failed:', clipboardError);
+          btn.innerHTML = '<span>✅ Captured (DL only)</span>';
+        }
+      }
+    }, 'image/png');
   } catch (error) {
     console.error('[PyTutor Focus] Capture failed:', error);
     btn.innerHTML = '<span>❌ Failed</span>';
