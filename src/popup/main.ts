@@ -1,6 +1,3 @@
-// Popup script to show current status and toggle focus mode
-const STORAGE_KEY = 'focusModeEnabled';
-
 let currentTab: chrome.tabs.Tab | null = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -18,11 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (tab && tab.url && tab.url.includes('pythontutor.com')) {
       toggleButton.disabled = false;
 
-      // Get current focus mode state
-      chrome.storage.local.get([STORAGE_KEY], (result) => {
-        const isEnabled = result[STORAGE_KEY] || false;
-        updateStatus(isEnabled, statusValue, buttonText);
-      });
+      // Get current focus mode state from content script
+      try {
+        const response = await chrome.tabs.sendMessage(tab.id!, { action: 'get-status' });
+        if (response && response.success) {
+          updateStatus(response.enabled, statusValue, buttonText);
+        }
+      } catch (e) {
+        console.log('[PyTutor Focus] Content script not ready');
+      }
 
       // Add click handler for toggle button
       toggleButton.addEventListener('click', async () => {

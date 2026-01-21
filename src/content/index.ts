@@ -2,32 +2,14 @@ import './styles.css';
 import html2canvas from 'html2canvas';
 
 const FOCUS_MODE_CLASS = 'pytutor-focus-mode';
-const STORAGE_KEY = 'focusModeEnabled';
 
 // Initialize focus mode state
 let isFocusModeEnabled = false;
 
 // Initialize focus mode
 const initFocusMode = () => {
-  chrome.storage.local.get([STORAGE_KEY], (result) => {
-    isFocusModeEnabled = result[STORAGE_KEY] || false;
-
-    // If enabled, we need to wait for body to exist
-    if (isFocusModeEnabled) {
-      if (document.body) {
-        enableFocusMode();
-      } else {
-        const observer = new MutationObserver(() => {
-          if (document.body) {
-            enableFocusMode();
-            observer.disconnect();
-          }
-        });
-        observer.observe(document.documentElement, { childList: true });
-      }
-    }
-    console.log('[PyTutor Focus] Content script initialized. Mode:', isFocusModeEnabled ? 'Enabled' : 'Disabled');
-  });
+  // Focus mode is transient; it starts disabled on every reload.
+  console.log('[PyTutor Focus] Content script initialized. Mode: Disabled');
 };
 
 initFocusMode();
@@ -36,6 +18,8 @@ initFocusMode();
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === 'toggle-focus-mode') {
     toggleFocusMode();
+    sendResponse({ success: true, enabled: isFocusModeEnabled });
+  } else if (message.action === 'get-status') {
     sendResponse({ success: true, enabled: isFocusModeEnabled });
   }
   return true;
@@ -49,9 +33,6 @@ function toggleFocusMode() {
   } else {
     disableFocusMode();
   }
-
-  // Save state to storage
-  chrome.storage.local.set({ [STORAGE_KEY]: isFocusModeEnabled });
 }
 
 function enableFocusMode() {
